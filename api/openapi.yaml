@@ -1,0 +1,955 @@
+openapi: 3.1.0
+info:
+  description: "Generate PDFs from HTML templates via API. Design once, generate thousands."
+  title: TemplateFox API
+  version: 1.0.0
+servers:
+- description: Production
+  url: https://api.pdftemplateapi.com
+security:
+- ApiKeyAuth: []
+paths:
+  /v1/pdf/create:
+    post:
+      description: |-
+        Generate a PDF from a saved template with dynamic data.
+
+        **Authentication:** API Key required (`x-api-key` header)
+
+        ## Request Body
+
+        | Field | Type | Required | Description |
+        |-------|------|----------|-------------|
+        | `template_id` | string | ✅ Yes | Template short ID (12 characters) |
+        | `data` | object | ✅ Yes | Key-value data to render in template |
+        | `export_type` | string | No | `url` (default) or `binary` |
+        | `expiration` | integer | No | URL expiration in seconds (60-604800, default: 86400) |
+
+        ## Export Types
+        - `url` (default): PDF is uploaded to CDN, returns JSON with URL
+        - `binary`: Returns raw PDF bytes directly
+
+        **Credits:** 1 credit deducted per successful generation.
+      operationId: createPdf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePdfRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                url: https://cdn.example.com/generated/abc123.pdf
+                filename: invoice-001.pdf
+                credits_remaining: 99
+                expires_in: 86400
+              schema:
+                $ref: "#/components/schemas/CreatePdfResponse"
+            application/pdf:
+              schema:
+                format: binary
+                type: string
+          description: PDF generated successfully
+        "402":
+          description: Insufficient credits
+        "403":
+          description: Access denied - not your template
+        "404":
+          description: Template not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Generate PDF from template
+      tags:
+      - PDF
+  /v1/templates:
+    get:
+      description: |-
+        List all templates for the authenticated user.
+
+        **Authentication:** API Key required (`x-api-key` header) or JWT token
+
+        **Usage:** This endpoint is designed for no-code tools (Zapier, Make, n8n) to populate
+        template selection dropdowns.
+
+        **No credits consumed:** This is a read-only endpoint.
+      operationId: listTemplates
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                templates:
+                - id: HMQywVpZxqAM
+                  name: Invoice Template
+                  created_at: 2024-01-15T10:30:00Z
+                  updated_at: 2024-01-20T14:45:00Z
+                - id: xK9mNpQrStUv
+                  name: Contract Template
+                  created_at: 2024-02-01T09:00:00Z
+                  updated_at: 2024-02-01T09:00:00Z
+              schema:
+                $ref: "#/components/schemas/TemplatesListResponse"
+          description: List of templates
+        "403":
+          description: Invalid or missing API key
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: List templates
+      tags:
+      - Templates
+  /v1/templates/{template_id}/fields:
+    get:
+      description: |-
+        Get the dynamic fields for a template.
+
+        **Authentication:** API Key required (`x-api-key` header) or JWT token
+
+        **Usage:** This endpoint is designed for Zapier Dynamic Fields integration.
+        It returns an array of field definitions that Zapier uses to dynamically
+        generate input forms.
+
+        **Response format:** Array of objects compatible with Zapier InputFieldsSchema.
+        Each field has: `key`, `label`, `type`, `required`, and optional `helpText`.
+
+        **Field types:**
+        - `string`: Text input (also used for JSON arrays/objects)
+        - `integer`: Integer number
+        - `number`: Decimal number
+        - `boolean`: True/False checkbox
+
+        **Arrays and objects:** Complex types are returned as `string` type with
+        a `helpText` showing the expected JSON format.
+
+        **No credits consumed:** This is a read-only endpoint.
+      operationId: getTemplateFields
+      parameters:
+      - explode: false
+        in: path
+        name: template_id
+        required: true
+        schema:
+          title: Template Id
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+              - key: customer_name
+                label: Customer Name
+                type: string
+                required: true
+                helpText: "e.g., John Doe"
+              - key: invoice_number
+                label: Invoice Number
+                type: string
+                required: true
+                helpText: "e.g., INV-001"
+              - key: total_amount
+                label: Total Amount
+                type: number
+                required: false
+                helpText: "e.g., 1234.56"
+              - key: line_items
+                label: Line Items
+                type: string
+                required: false
+                helpText: "JSON array, e.g., [{\"name\": \"Item 1\", \"price\": 100}]"
+              schema:
+                items:
+                  $ref: "#/components/schemas/TemplateField"
+                title: Response Gettemplatefields
+                type: array
+          description: List of template fields
+        "403":
+          description: Invalid or missing API key
+        "404":
+          description: Template not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get template fields
+      tags:
+      - Templates
+  /v1/account:
+    get:
+      description: |-
+        Get account information including remaining credits.
+
+        **Authentication:** API Key required (`x-api-key` header) or JWT token
+
+        **Usage:** Check credit balance before performing operations.
+
+        **No credits consumed:** This is a read-only endpoint.
+      operationId: getAccount
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                credits: 150
+                email: user@example.com
+              schema:
+                $ref: "#/components/schemas/AccountInfoResponse"
+          description: Account information
+        "403":
+          description: Invalid or missing API key
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get account info
+      tags:
+      - Account
+  /v1/account/transactions:
+    get:
+      description: |-
+        List transaction history for the authenticated user.
+
+        **Authentication:** API Key required (`x-api-key` header) or JWT token
+
+        **Pagination:** Use `limit` and `offset` query parameters.
+
+        **Transaction types:**
+        - `PDFGEN`: PDF generation (consumes credits)
+        - `REFUND`: Credit refund (on failed generation)
+        - `PURCHASE`: Credit purchase
+        - `BONUS`: Bonus credits
+
+        **Credits field:**
+        - Positive value = credits consumed
+        - Negative value = credits added
+
+        **No credits consumed:** This is a read-only endpoint.
+      operationId: listTransactions
+      parameters:
+      - description: Number of records to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 300
+          description: Number of records to return
+          maximum: 1000
+          minimum: 1
+          title: Limit
+          type: integer
+        style: form
+      - description: Number of records to skip
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: Number of records to skip
+          minimum: 0
+          title: Offset
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                transactions:
+                - transaction_ref: 550e8400-e29b-41d4-a716-446655440000
+                  transaction_type: PDFGEN
+                  template_id: HMQywVpZxqAM
+                  exec_tm: 1250
+                  credits: 1
+                  created_at: 2024-01-20T14:30:00Z
+                - transaction_ref: 660e8400-e29b-41d4-a716-446655440001
+                  transaction_type: PURCHASE
+                  credits: -100
+                  created_at: 2024-01-15T10:00:00Z
+                total: 42
+                limit: 300
+                offset: 0
+              schema:
+                $ref: "#/components/schemas/TransactionsResponse"
+          description: Transaction history
+        "403":
+          description: Invalid or missing API key
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: List transactions
+      tags:
+      - Account
+  /v1/integrations/s3:
+    delete:
+      description: |-
+        Delete S3 storage configuration.
+
+        **Authentication:** API Key required (`x-api-key` header) with admin privileges
+
+        **Usage:** Remove your S3 integration. Generated PDFs will use the default CDN storage after deletion.
+
+        **Warning:** This action is irreversible. You'll need to reconfigure S3 to use it again.
+
+        **No credits consumed:** This is a configuration endpoint.
+      operationId: deleteS3Config
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                success: true
+              schema:
+                $ref: "#/components/schemas/S3SuccessResponse"
+          description: Configuration deleted successfully
+        "403":
+          description: Admin privileges required
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete S3 configuration
+      tags:
+      - Integrations
+    get:
+      description: |-
+        Get current S3 storage configuration.
+
+        **Authentication:** API Key required (`x-api-key` header) with admin privileges
+
+        **Usage:** Retrieve your S3 integration settings. Secret access key is masked for security.
+
+        **Returns 404** if S3 is not configured.
+
+        **No credits consumed:** This is a read-only endpoint.
+      operationId: getS3Config
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                configured: true
+                endpoint_url: https://s3.amazonaws.com
+                access_key_id: AKIAIOSFODNN7EXAMPLE
+                secret_access_key_masked: wJal...EKEY
+                bucket_name: my-pdf-bucket
+                default_prefix: generated/pdfs/
+              schema:
+                $ref: "#/components/schemas/S3ConfigResponse"
+          description: S3 configuration retrieved successfully
+        "403":
+          description: Admin privileges required
+        "404":
+          description: S3 is not configured
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get S3 configuration
+      tags:
+      - Integrations
+    post:
+      description: |-
+        Save or update S3-compatible storage configuration.
+
+        **Authentication:** API Key required (`x-api-key` header) with admin privileges
+
+        **Usage:** Configure your S3-compatible storage to receive generated PDFs directly
+        in your own bucket instead of the default CDN.
+
+        **Supported providers:**
+        - Amazon S3
+        - DigitalOcean Spaces
+        - Cloudflare R2
+        - MinIO
+        - Any S3-compatible storage
+
+        **Secret key behavior:**
+        - For new configuration: `secret_access_key` is required
+        - For updates: Omit `secret_access_key` to keep existing value
+
+        **No credits consumed:** This is a configuration endpoint.
+      operationId: saveS3Config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/S3ConfigRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                success: true
+              schema:
+                $ref: "#/components/schemas/S3SuccessResponse"
+          description: Configuration saved successfully
+        "400":
+          description: "Invalid configuration (e.g., missing secret key for new config)"
+        "403":
+          description: Admin privileges required
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Save S3 configuration
+      tags:
+      - Integrations
+  /v1/integrations/s3/test:
+    post:
+      description: |-
+        Test S3 connection with stored credentials.
+
+        **Authentication:** API Key required (`x-api-key` header) with admin privileges
+
+        **Usage:** Verify your S3 configuration is working correctly. The test will:
+        1. Connect to the endpoint
+        2. Verify bucket access
+        3. Check write permissions by uploading a small test file
+
+        **Prerequisite:** S3 must be configured first using `POST /v1/integrations/s3`
+
+        **No credits consumed:** This is a diagnostic endpoint.
+      operationId: testS3Connection
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                success: true
+                message: Connection successful. Bucket is accessible.
+              schema:
+                $ref: "#/components/schemas/S3TestResponse"
+          description: Connection test successful
+        "400":
+          content:
+            application/json:
+              examples:
+                not_configured:
+                  summary: S3 not configured
+                  value:
+                    detail: S3 is not configured
+                connection_failed:
+                  summary: Connection failed
+                  value:
+                    detail: Could not connect to endpoint
+                bucket_not_found:
+                  summary: Bucket not found
+                  value:
+                    detail: Bucket 'my-bucket' not found
+          description: Connection test failed
+        "403":
+          description: Admin privileges required
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+          description: Validation Error
+      security:
+      - ApiKeyAuth: []
+      summary: Test S3 connection
+      tags:
+      - Integrations
+components:
+  schemas:
+    AccountInfoResponse:
+      description: Response for account info endpoint
+      example:
+        credits: 0
+        email: email
+      properties:
+        credits:
+          description: Remaining credits
+          title: Credits
+          type: integer
+        email:
+          nullable: true
+          type: string
+      required:
+      - credits
+      title: AccountInfoResponse
+    CreatePdfRequest:
+      description: Request model for PDF generation
+      example:
+        export_type: ""
+        filename: filename
+        data:
+          key: ""
+        store_s3: false
+        s3_filepath: s3_filepath
+        template_id: template_id
+        expiration: 48489
+        s3_bucket: s3_bucket
+      properties:
+        template_id:
+          description: '**Required.** Template short ID (12 characters)'
+          maxLength: 12
+          minLength: 12
+          title: Template ID
+          type: string
+        data:
+          additionalProperties: true
+          description: '**Required.** Key-value data to render in the template. Keys
+            must match template variables.'
+          title: Template Data
+          type: object
+        export_type:
+          allOf:
+          - $ref: "#/components/schemas/ExportType"
+          default: url
+          description: "Export format: `url` uploads to CDN and returns URL, `binary`\
+            \ returns raw PDF bytes"
+          title: Export Type
+        expiration:
+          default: 86400
+          description: "URL expiration in seconds. Min: 60 (1 min), Max: 604800 (7\
+            \ days). Only applies to `url` export type."
+          maximum: 604800.0
+          minimum: 60.0
+          title: URL Expiration
+          type: integer
+        filename:
+          maxLength: 100
+          nullable: true
+          pattern: "^[a-zA-Z0-9_\\-\\.]+$"
+          type: string
+        store_s3:
+          default: false
+          description: Upload to your configured S3 bucket instead of CDN
+          title: Store to S3
+          type: boolean
+        s3_filepath:
+          maxLength: 500
+          nullable: true
+          pattern: "^[a-zA-Z0-9_\\-\\./]+$"
+          type: string
+        s3_bucket:
+          maxLength: 63
+          minLength: 3
+          nullable: true
+          pattern: "^[a-z0-9][a-z0-9.\\-]*[a-z0-9]$"
+          type: string
+      required:
+      - data
+      - template_id
+      title: CreatePdfRequest
+    CreatePdfResponse:
+      description: Response for URL export type
+      example:
+        filename: filename
+        credits_remaining: 0
+        expires_in: 6
+        url: url
+      properties:
+        url:
+          description: Signed URL to download the PDF (expires after specified time)
+          title: Url
+          type: string
+        filename:
+          description: Filename of the generated PDF
+          title: Filename
+          type: string
+        credits_remaining:
+          description: Remaining credits after this request
+          title: Credits Remaining
+          type: integer
+        expires_in:
+          description: Seconds until URL expires
+          title: Expires In
+          type: integer
+      required:
+      - credits_remaining
+      - expires_in
+      - filename
+      - url
+      title: CreatePdfResponse
+    ExportType:
+      description: PDF export type options
+      enum:
+      - url
+      - binary
+      title: ExportType
+      type: string
+    HTTPValidationError:
+      example:
+        detail:
+        - msg: msg
+          loc:
+          - Location_inner
+          - Location_inner
+          type: type
+        - msg: msg
+          loc:
+          - Location_inner
+          - Location_inner
+          type: type
+      properties:
+        detail:
+          items:
+            $ref: "#/components/schemas/ValidationError"
+          title: Detail
+          type: array
+      title: HTTPValidationError
+    S3ConfigRequest:
+      description: Request model for S3 configuration
+      example:
+        access_key_id: access_key_id
+        default_prefix: ""
+        endpoint_url: endpoint_url
+        bucket_name: bucket_name
+        secret_access_key: secret_access_key
+      properties:
+        endpoint_url:
+          description: S3-compatible endpoint URL. Must start with https://
+          maxLength: 200
+          minLength: 10
+          pattern: ^https://
+          title: Endpoint Url
+          type: string
+        access_key_id:
+          description: Access key ID for S3 authentication
+          maxLength: 128
+          minLength: 16
+          title: Access Key Id
+          type: string
+        secret_access_key:
+          maxLength: 128
+          minLength: 16
+          nullable: true
+          type: string
+        bucket_name:
+          description: "S3 bucket name. Must follow S3 naming conventions (lowercase,\
+            \ no underscores)"
+          maxLength: 63
+          minLength: 3
+          pattern: "^[a-z0-9][a-z0-9.\\-]*[a-z0-9]$"
+          title: Bucket Name
+          type: string
+        default_prefix:
+          default: ""
+          description: Default path prefix for uploaded files. Can include slashes
+            for folder structure
+          maxLength: 500
+          pattern: "^[a-zA-Z0-9_\\-\\./]*$"
+          title: Default Prefix
+          type: string
+      required:
+      - access_key_id
+      - bucket_name
+      - endpoint_url
+      title: S3ConfigRequest
+    S3ConfigResponse:
+      description: Response for S3 configuration (with masked secret)
+      example:
+        configured: true
+        access_key_id: access_key_id
+        default_prefix: default_prefix
+        endpoint_url: endpoint_url
+        bucket_name: bucket_name
+        secret_access_key_masked: secret_access_key_masked
+      properties:
+        configured:
+          description: Whether S3 is configured
+          title: Configured
+          type: boolean
+        endpoint_url:
+          description: S3-compatible endpoint URL
+          title: Endpoint Url
+          type: string
+        access_key_id:
+          description: Access key ID
+          title: Access Key Id
+          type: string
+        secret_access_key_masked:
+          description: Masked secret access key (shows first 4 and last 4 characters)
+          title: Secret Access Key Masked
+          type: string
+        bucket_name:
+          description: S3 bucket name
+          title: Bucket Name
+          type: string
+        default_prefix:
+          description: Default path prefix for uploads
+          title: Default Prefix
+          type: string
+      required:
+      - access_key_id
+      - bucket_name
+      - configured
+      - default_prefix
+      - endpoint_url
+      - secret_access_key_masked
+      title: S3ConfigResponse
+    S3SuccessResponse:
+      description: Generic success response for S3 operations
+      example:
+        success: true
+      properties:
+        success:
+          description: Whether the operation succeeded
+          title: Success
+          type: boolean
+      required:
+      - success
+      title: S3SuccessResponse
+    S3TestResponse:
+      description: Response for S3 connection test
+      example:
+        success: true
+        message: message
+      properties:
+        success:
+          description: Whether the connection test succeeded
+          title: Success
+          type: boolean
+        message:
+          description: Test result message
+          title: Message
+          type: string
+      required:
+      - message
+      - success
+      title: S3TestResponse
+    TemplateField:
+      description: Zapier InputFieldsSchema compatible field
+      example:
+        helpText: helpText
+        label: label
+        type: string
+        key: key
+        required: false
+      properties:
+        key:
+          description: Field key/identifier
+          title: Key
+          type: string
+        label:
+          description: Human-readable label
+          title: Label
+          type: string
+        type:
+          default: string
+          description: "Field type: string, integer, number, boolean"
+          title: Type
+          type: string
+        required:
+          default: false
+          description: Whether the field is required
+          title: Required
+          type: boolean
+        helpText:
+          nullable: true
+          type: string
+      required:
+      - key
+      - label
+      title: TemplateField
+    TemplateListItem:
+      description: Template item in list response
+      example:
+        updated_at: updated_at
+        name: name
+        created_at: created_at
+        id: id
+      properties:
+        id:
+          description: Template short ID (12 characters)
+          title: Id
+          type: string
+        name:
+          description: Template name
+          title: Name
+          type: string
+        created_at:
+          description: ISO 8601 timestamp
+          title: Created At
+          type: string
+        updated_at:
+          description: ISO 8601 timestamp
+          title: Updated At
+          type: string
+      required:
+      - created_at
+      - id
+      - name
+      - updated_at
+      title: TemplateListItem
+    TemplatesListResponse:
+      description: Response for template list endpoint
+      example:
+        templates:
+        - updated_at: updated_at
+          name: name
+          created_at: created_at
+          id: id
+        - updated_at: updated_at
+          name: name
+          created_at: created_at
+          id: id
+      properties:
+        templates:
+          items:
+            $ref: "#/components/schemas/TemplateListItem"
+          title: Templates
+          type: array
+      required:
+      - templates
+      title: TemplatesListResponse
+    Transaction:
+      description: Transaction record
+      example:
+        credits: 6
+        created_at: created_at
+        template_id: template_id
+        transaction_type: transaction_type
+        transaction_ref: transaction_ref
+        exec_tm: 0
+      properties:
+        transaction_ref:
+          description: Unique transaction reference (UUID)
+          title: Transaction Ref
+          type: string
+        transaction_type:
+          description: "Transaction type: PDFGEN, PURCHASE, REFUND, BONUS"
+          title: Transaction Type
+          type: string
+        template_id:
+          nullable: true
+          type: string
+        exec_tm:
+          nullable: true
+          type: integer
+        credits:
+          description: Credits consumed (positive) or added (negative)
+          title: Credits
+          type: integer
+        created_at:
+          description: ISO 8601 timestamp
+          title: Created At
+          type: string
+      required:
+      - created_at
+      - credits
+      - transaction_ref
+      - transaction_type
+      title: Transaction
+    TransactionsResponse:
+      description: Response for transactions list endpoint
+      example:
+        total: 1
+        offset: 5
+        limit: 5
+        transactions:
+        - credits: 6
+          created_at: created_at
+          template_id: template_id
+          transaction_type: transaction_type
+          transaction_ref: transaction_ref
+          exec_tm: 0
+        - credits: 6
+          created_at: created_at
+          template_id: template_id
+          transaction_type: transaction_type
+          transaction_ref: transaction_ref
+          exec_tm: 0
+      properties:
+        transactions:
+          items:
+            $ref: "#/components/schemas/Transaction"
+          title: Transactions
+          type: array
+        total:
+          description: Total number of transactions
+          title: Total
+          type: integer
+        limit:
+          description: Number of records returned
+          title: Limit
+          type: integer
+        offset:
+          description: Number of records skipped
+          title: Offset
+          type: integer
+      required:
+      - limit
+      - offset
+      - total
+      - transactions
+      title: TransactionsResponse
+    ValidationError:
+      example:
+        msg: msg
+        loc:
+        - Location_inner
+        - Location_inner
+        type: type
+      properties:
+        loc:
+          items:
+            $ref: "#/components/schemas/Location_inner"
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Location_inner:
+      anyOf:
+      - type: string
+      - type: integer
+  securitySchemes:
+    ApiKeyAuth:
+      description: API key for authentication. Get yours at https://pdftemplateapi.com/dashboard/api-keys
+      in: header
+      name: x-api-key
+      type: apiKey
+
