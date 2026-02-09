@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateFox.SDK", "src\TemplateFox.SDK\TemplateFox.SDK.csproj", "{2E646295-BDA9-41BC-8099-84ECE1A48953}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateFox.SDK", "src\TemplateFox.SDK\TemplateFox.SDK.csproj", "{85F0F776-09F2-407F-A0C0-022F2AFBDD8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateFox.SDK.Test", "src\TemplateFox.SDK.Test\TemplateFox.SDK.Test.csproj", "{19F1DEBC-DE5E-4517-8062-F000CD499087}"
 EndProject
@@ -12,10 +12,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2E646295-BDA9-41BC-8099-84ECE1A48953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E646295-BDA9-41BC-8099-84ECE1A48953}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E646295-BDA9-41BC-8099-84ECE1A48953}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E646295-BDA9-41BC-8099-84ECE1A48953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85F0F776-09F2-407F-A0C0-022F2AFBDD8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85F0F776-09F2-407F-A0C0-022F2AFBDD8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85F0F776-09F2-407F-A0C0-022F2AFBDD8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85F0F776-09F2-407F-A0C0-022F2AFBDD8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19F1DEBC-DE5E-4517-8062-F000CD499087}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19F1DEBC-DE5E-4517-8062-F000CD499087}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19F1DEBC-DE5E-4517-8062-F000CD499087}.Release|Any CPU.ActiveCfg = Release|Any CPU
