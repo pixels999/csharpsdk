@@ -27,60 +27,59 @@ using OpenAPIDateConverter = TemplateFox.SDK.Client.OpenAPIDateConverter;
 namespace TemplateFox.SDK.Model
 {
     /// <summary>
-    /// ValidationError
+    /// Spec for array item fields
     /// </summary>
-    [DataContract(Name = "ValidationError")]
-    public partial class ValidationError : IValidatableObject
+    [DataContract(Name = "TemplateFieldSpec")]
+    public partial class TemplateFieldSpec : IValidatableObject
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationError" /> class.
+        /// Initializes a new instance of the <see cref="TemplateFieldSpec" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected ValidationError() { }
+        protected TemplateFieldSpec() { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationError" /> class.
+        /// Initializes a new instance of the <see cref="TemplateFieldSpec" /> class.
         /// </summary>
-        /// <param name="loc">loc (required).</param>
-        /// <param name="msg">msg (required).</param>
-        /// <param name="type">type (required).</param>
-        public ValidationError(List<LocationInner> loc = default, string msg = default, string type = default)
+        /// <param name="name">Field name (required).</param>
+        /// <param name="label">Field label (required).</param>
+        /// <param name="type">Field type: text, number (default to &quot;text&quot;).</param>
+        public TemplateFieldSpec(string name = default, string label = default, string type = @"text")
         {
-            // to ensure "loc" is required (not null)
-            if (loc == null)
+            // to ensure "name" is required (not null)
+            if (name == null)
             {
-                throw new ArgumentNullException("loc is a required property for ValidationError and cannot be null");
+                throw new ArgumentNullException("name is a required property for TemplateFieldSpec and cannot be null");
             }
-            this.Loc = loc;
-            // to ensure "msg" is required (not null)
-            if (msg == null)
+            this.Name = name;
+            // to ensure "label" is required (not null)
+            if (label == null)
             {
-                throw new ArgumentNullException("msg is a required property for ValidationError and cannot be null");
+                throw new ArgumentNullException("label is a required property for TemplateFieldSpec and cannot be null");
             }
-            this.Msg = msg;
-            // to ensure "type" is required (not null)
-            if (type == null)
-            {
-                throw new ArgumentNullException("type is a required property for ValidationError and cannot be null");
-            }
-            this.Type = type;
+            this.Label = label;
+            // use default value if no "type" provided
+            this.Type = type ?? @"text";
         }
 
         /// <summary>
-        /// Gets or Sets Loc
+        /// Field name
         /// </summary>
-        [DataMember(Name = "loc", IsRequired = true, EmitDefaultValue = true)]
-        public List<LocationInner> Loc { get; set; }
+        /// <value>Field name</value>
+        [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = true)]
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or Sets Msg
+        /// Field label
         /// </summary>
-        [DataMember(Name = "msg", IsRequired = true, EmitDefaultValue = true)]
-        public string Msg { get; set; }
+        /// <value>Field label</value>
+        [DataMember(Name = "label", IsRequired = true, EmitDefaultValue = true)]
+        public string Label { get; set; }
 
         /// <summary>
-        /// Gets or Sets Type
+        /// Field type: text, number
         /// </summary>
-        [DataMember(Name = "type", IsRequired = true, EmitDefaultValue = true)]
+        /// <value>Field type: text, number</value>
+        [DataMember(Name = "type", EmitDefaultValue = false)]
         public string Type { get; set; }
 
         /// <summary>
@@ -90,9 +89,9 @@ namespace TemplateFox.SDK.Model
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("class ValidationError {\n");
-            sb.Append("  Loc: ").Append(Loc).Append("\n");
-            sb.Append("  Msg: ").Append(Msg).Append("\n");
+            sb.Append("class TemplateFieldSpec {\n");
+            sb.Append("  Name: ").Append(Name).Append("\n");
+            sb.Append("  Label: ").Append(Label).Append("\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
             sb.Append("}\n");
             return sb.ToString();

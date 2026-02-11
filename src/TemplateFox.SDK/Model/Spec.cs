@@ -28,32 +28,41 @@ using System.Reflection;
 namespace TemplateFox.SDK.Model
 {
     /// <summary>
-    /// LocationInner
+    /// For array fields: spec defining the structure of each item
     /// </summary>
-    [JsonConverter(typeof(LocationInnerJsonConverter))]
-    [DataContract(Name = "Location_inner")]
-    public partial class LocationInner : AbstractOpenAPISchema, IValidatableObject
+    [JsonConverter(typeof(SpecJsonConverter))]
+    [DataContract(Name = "Spec")]
+    public partial class Spec : AbstractOpenAPISchema, IValidatableObject
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LocationInner" /> class
-        /// with the <see cref="string" /> class
+        /// Initializes a new instance of the <see cref="Spec" /> class.
         /// </summary>
-        /// <param name="actualInstance">An instance of string.</param>
-        public LocationInner(string actualInstance)
+        public Spec()
         {
-            IsNullable = false;
+            IsNullable = true;
             SchemaType= "anyOf";
-            ActualInstance = actualInstance ?? throw new ArgumentException("Invalid instance found. Must not be null.");
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LocationInner" /> class
-        /// with the <see cref="int" /> class
+        /// Initializes a new instance of the <see cref="Spec" /> class
+        /// with the <see cref="List{TemplateFieldSpec}" /> class
         /// </summary>
-        /// <param name="actualInstance">An instance of int.</param>
-        public LocationInner(int actualInstance)
+        /// <param name="actualInstance">An instance of List&lt;TemplateFieldSpec&gt;.</param>
+        public Spec(List<TemplateFieldSpec> actualInstance)
         {
-            IsNullable = false;
+            IsNullable = true;
+            SchemaType= "anyOf";
+            ActualInstance = actualInstance;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Spec" /> class
+        /// with the <see cref="TemplateFieldSpec" /> class
+        /// </summary>
+        /// <param name="actualInstance">An instance of TemplateFieldSpec.</param>
+        public Spec(TemplateFieldSpec actualInstance)
+        {
+            IsNullable = true;
             SchemaType= "anyOf";
             ActualInstance = actualInstance;
         }
@@ -72,39 +81,39 @@ namespace TemplateFox.SDK.Model
             }
             set
             {
-                if (value.GetType() == typeof(int))
+                if (value.GetType() == typeof(List<TemplateFieldSpec>))
                 {
                     _actualInstance = value;
                 }
-                else if (value.GetType() == typeof(string))
+                else if (value.GetType() == typeof(TemplateFieldSpec))
                 {
                     _actualInstance = value;
                 }
                 else
                 {
-                    throw new ArgumentException("Invalid instance found. Must be the following types: int, string");
+                    throw new ArgumentException("Invalid instance found. Must be the following types: List<TemplateFieldSpec>, TemplateFieldSpec");
                 }
             }
         }
 
         /// <summary>
-        /// Get the actual instance of `string`. If the actual instance is not `string`,
+        /// Get the actual instance of `List&lt;TemplateFieldSpec&gt;`. If the actual instance is not `List&lt;TemplateFieldSpec&gt;`,
         /// the InvalidClassException will be thrown
         /// </summary>
-        /// <returns>An instance of string</returns>
-        public string GetString()
+        /// <returns>An instance of List&lt;TemplateFieldSpec&gt;</returns>
+        public List<TemplateFieldSpec> GetList()
         {
-            return (string)ActualInstance;
+            return (List<TemplateFieldSpec>)ActualInstance;
         }
 
         /// <summary>
-        /// Get the actual instance of `int`. If the actual instance is not `int`,
+        /// Get the actual instance of `TemplateFieldSpec`. If the actual instance is not `TemplateFieldSpec`,
         /// the InvalidClassException will be thrown
         /// </summary>
-        /// <returns>An instance of int</returns>
-        public int GetInt()
+        /// <returns>An instance of TemplateFieldSpec</returns>
+        public TemplateFieldSpec GetTemplateFieldSpec()
         {
-            return (int)ActualInstance;
+            return (TemplateFieldSpec)ActualInstance;
         }
 
         /// <summary>
@@ -114,7 +123,7 @@ namespace TemplateFox.SDK.Model
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class LocationInner {\n");
+            sb.Append("class Spec {\n");
             sb.Append("  ActualInstance: ").Append(ActualInstance).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
@@ -126,45 +135,45 @@ namespace TemplateFox.SDK.Model
         /// <returns>JSON string presentation of the object</returns>
         public override string ToJson()
         {
-            return JsonConvert.SerializeObject(ActualInstance, LocationInner.SerializerSettings);
+            return JsonConvert.SerializeObject(ActualInstance, Spec.SerializerSettings);
         }
 
         /// <summary>
-        /// Converts the JSON string into an instance of LocationInner
+        /// Converts the JSON string into an instance of Spec
         /// </summary>
         /// <param name="jsonString">JSON string</param>
-        /// <returns>An instance of LocationInner</returns>
-        public static LocationInner FromJson(string jsonString)
+        /// <returns>An instance of Spec</returns>
+        public static Spec FromJson(string jsonString)
         {
-            LocationInner newLocationInner = null;
+            Spec newSpec = null;
 
             if (string.IsNullOrEmpty(jsonString))
             {
-                return newLocationInner;
+                return newSpec;
             }
 
             try
             {
-                newLocationInner = new LocationInner(JsonConvert.DeserializeObject<int>(jsonString, LocationInner.SerializerSettings));
+                newSpec = new Spec(JsonConvert.DeserializeObject<List<TemplateFieldSpec>>(jsonString, Spec.SerializerSettings));
                 // deserialization is considered successful at this point if no exception has been thrown.
-                return newLocationInner;
+                return newSpec;
             }
             catch (Exception exception)
             {
                 // deserialization failed, try the next one
-                System.Diagnostics.Debug.WriteLine(string.Format("Failed to deserialize `{0}` into int: {1}", jsonString, exception.ToString()));
+                System.Diagnostics.Debug.WriteLine(string.Format("Failed to deserialize `{0}` into List<TemplateFieldSpec>: {1}", jsonString, exception.ToString()));
             }
 
             try
             {
-                newLocationInner = new LocationInner(JsonConvert.DeserializeObject<string>(jsonString, LocationInner.SerializerSettings));
+                newSpec = new Spec(JsonConvert.DeserializeObject<TemplateFieldSpec>(jsonString, Spec.SerializerSettings));
                 // deserialization is considered successful at this point if no exception has been thrown.
-                return newLocationInner;
+                return newSpec;
             }
             catch (Exception exception)
             {
                 // deserialization failed, try the next one
-                System.Diagnostics.Debug.WriteLine(string.Format("Failed to deserialize `{0}` into string: {1}", jsonString, exception.ToString()));
+                System.Diagnostics.Debug.WriteLine(string.Format("Failed to deserialize `{0}` into TemplateFieldSpec: {1}", jsonString, exception.ToString()));
             }
 
             // no match found, throw an exception
@@ -183,9 +192,9 @@ namespace TemplateFox.SDK.Model
     }
 
     /// <summary>
-    /// Custom JSON converter for LocationInner
+    /// Custom JSON converter for Spec
     /// </summary>
-    public class LocationInnerJsonConverter : JsonConverter
+    public class SpecJsonConverter : JsonConverter
     {
         /// <summary>
         /// To write the JSON string
@@ -195,7 +204,7 @@ namespace TemplateFox.SDK.Model
         /// <param name="serializer">JSON Serializer</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteRawValue((string)(typeof(LocationInner).GetMethod("ToJson").Invoke(value, null)));
+            writer.WriteRawValue((string)(typeof(Spec).GetMethod("ToJson").Invoke(value, null)));
         }
 
         /// <summary>
@@ -210,14 +219,10 @@ namespace TemplateFox.SDK.Model
         {
             switch(reader.TokenType) 
             {
-                case JsonToken.String: 
-                    return new LocationInner(Convert.ToString(reader.Value));
-                case JsonToken.Integer: 
-                    return new LocationInner(Convert.ToInt32(reader.Value));
                 case JsonToken.StartObject:
-                    return LocationInner.FromJson(JObject.Load(reader).ToString(Formatting.None));
+                    return Spec.FromJson(JObject.Load(reader).ToString(Formatting.None));
                 case JsonToken.StartArray:
-                    return LocationInner.FromJson(JArray.Load(reader).ToString(Formatting.None));
+                    return Spec.FromJson(JArray.Load(reader).ToString(Formatting.None));
                 default:
                     return null;
             }
