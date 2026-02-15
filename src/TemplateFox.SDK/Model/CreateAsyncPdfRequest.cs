@@ -27,46 +27,48 @@ using OpenAPIDateConverter = TemplateFox.SDK.Client.OpenAPIDateConverter;
 namespace TemplateFox.SDK.Model
 {
     /// <summary>
-    /// Request model for PDF generation
+    /// Request model for async PDF generation
     /// </summary>
-    [DataContract(Name = "CreatePdfRequest")]
-    public partial class CreatePdfRequest : IValidatableObject
+    [DataContract(Name = "CreateAsyncPdfRequest")]
+    public partial class CreateAsyncPdfRequest : IValidatableObject
     {
 
         /// <summary>
-        /// Export format: &#x60;url&#x60; uploads to CDN and returns URL, &#x60;binary&#x60; returns raw PDF bytes
+        /// Export format. Currently only &#x60;url&#x60; is supported for async.
         /// </summary>
-        /// <value>Export format: &#x60;url&#x60; uploads to CDN and returns URL, &#x60;binary&#x60; returns raw PDF bytes</value>
+        /// <value>Export format. Currently only &#x60;url&#x60; is supported for async.</value>
         [DataMember(Name = "export_type", EmitDefaultValue = false)]
-        public AppRoutersV1PdfExportType? ExportType { get; set; }
+        public AppRoutersV1PdfAsyncExportType? ExportType { get; set; }
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreatePdfRequest" /> class.
+        /// Initializes a new instance of the <see cref="CreateAsyncPdfRequest" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected CreatePdfRequest() { }
+        protected CreateAsyncPdfRequest() { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreatePdfRequest" /> class.
+        /// Initializes a new instance of the <see cref="CreateAsyncPdfRequest" /> class.
         /// </summary>
         /// <param name="templateId">**Required.** Template short ID (12 characters) (required).</param>
-        /// <param name="data">**Required.** Key-value data to render in the template. Keys must match template variables. (required).</param>
-        /// <param name="exportType">Export format: &#x60;url&#x60; uploads to CDN and returns URL, &#x60;binary&#x60; returns raw PDF bytes.</param>
-        /// <param name="expiration">URL expiration in seconds. Min: 60 (1 min), Max: 604800 (7 days). Only applies to &#x60;url&#x60; export type. (default to 86400).</param>
+        /// <param name="data">**Required.** Key-value data to render in the template. (required).</param>
+        /// <param name="exportType">Export format. Currently only &#x60;url&#x60; is supported for async..</param>
+        /// <param name="expiration">URL expiration in seconds (60-604800). Default: 86400 (24 hours). (default to 86400).</param>
         /// <param name="filename">filename.</param>
-        /// <param name="storeS3">Upload to your configured S3 bucket instead of CDN (default to false).</param>
+        /// <param name="storeS3">Upload to your configured S3 bucket instead of CDN. (default to false).</param>
         /// <param name="s3Filepath">s3Filepath.</param>
         /// <param name="s3Bucket">s3Bucket.</param>
-        public CreatePdfRequest(string templateId = default, Dictionary<string, Object> data = default, AppRoutersV1PdfExportType? exportType = default, int expiration = 86400, string filename = default, bool storeS3 = false, string s3Filepath = default, string s3Bucket = default)
+        /// <param name="webhookUrl">webhookUrl.</param>
+        /// <param name="webhookSecret">webhookSecret.</param>
+        public CreateAsyncPdfRequest(string templateId = default, Dictionary<string, Object> data = default, AppRoutersV1PdfAsyncExportType? exportType = default, int expiration = 86400, string filename = default, bool storeS3 = false, string s3Filepath = default, string s3Bucket = default, string webhookUrl = default, string webhookSecret = default)
         {
             // to ensure "templateId" is required (not null)
             if (templateId == null)
             {
-                throw new ArgumentNullException("templateId is a required property for CreatePdfRequest and cannot be null");
+                throw new ArgumentNullException("templateId is a required property for CreateAsyncPdfRequest and cannot be null");
             }
             this.TemplateId = templateId;
             // to ensure "data" is required (not null)
             if (data == null)
             {
-                throw new ArgumentNullException("data is a required property for CreatePdfRequest and cannot be null");
+                throw new ArgumentNullException("data is a required property for CreateAsyncPdfRequest and cannot be null");
             }
             this.Data = data;
             this.ExportType = exportType;
@@ -75,6 +77,8 @@ namespace TemplateFox.SDK.Model
             this.StoreS3 = storeS3;
             this.S3Filepath = s3Filepath;
             this.S3Bucket = s3Bucket;
+            this.WebhookUrl = webhookUrl;
+            this.WebhookSecret = webhookSecret;
         }
 
         /// <summary>
@@ -85,16 +89,16 @@ namespace TemplateFox.SDK.Model
         public string TemplateId { get; set; }
 
         /// <summary>
-        /// **Required.** Key-value data to render in the template. Keys must match template variables.
+        /// **Required.** Key-value data to render in the template.
         /// </summary>
-        /// <value>**Required.** Key-value data to render in the template. Keys must match template variables.</value>
+        /// <value>**Required.** Key-value data to render in the template.</value>
         [DataMember(Name = "data", IsRequired = true, EmitDefaultValue = true)]
         public Dictionary<string, Object> Data { get; set; }
 
         /// <summary>
-        /// URL expiration in seconds. Min: 60 (1 min), Max: 604800 (7 days). Only applies to &#x60;url&#x60; export type.
+        /// URL expiration in seconds (60-604800). Default: 86400 (24 hours).
         /// </summary>
-        /// <value>URL expiration in seconds. Min: 60 (1 min), Max: 604800 (7 days). Only applies to &#x60;url&#x60; export type.</value>
+        /// <value>URL expiration in seconds (60-604800). Default: 86400 (24 hours).</value>
         [DataMember(Name = "expiration", EmitDefaultValue = false)]
         public int Expiration { get; set; }
 
@@ -105,9 +109,9 @@ namespace TemplateFox.SDK.Model
         public string Filename { get; set; }
 
         /// <summary>
-        /// Upload to your configured S3 bucket instead of CDN
+        /// Upload to your configured S3 bucket instead of CDN.
         /// </summary>
-        /// <value>Upload to your configured S3 bucket instead of CDN</value>
+        /// <value>Upload to your configured S3 bucket instead of CDN.</value>
         [DataMember(Name = "store_s3", EmitDefaultValue = true)]
         public bool StoreS3 { get; set; }
 
@@ -124,13 +128,25 @@ namespace TemplateFox.SDK.Model
         public string S3Bucket { get; set; }
 
         /// <summary>
+        /// Gets or Sets WebhookUrl
+        /// </summary>
+        [DataMember(Name = "webhook_url", EmitDefaultValue = true)]
+        public string WebhookUrl { get; set; }
+
+        /// <summary>
+        /// Gets or Sets WebhookSecret
+        /// </summary>
+        [DataMember(Name = "webhook_secret", EmitDefaultValue = true)]
+        public string WebhookSecret { get; set; }
+
+        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("class CreatePdfRequest {\n");
+            sb.Append("class CreateAsyncPdfRequest {\n");
             sb.Append("  TemplateId: ").Append(TemplateId).Append("\n");
             sb.Append("  Data: ").Append(Data).Append("\n");
             sb.Append("  ExportType: ").Append(ExportType).Append("\n");
@@ -139,6 +155,8 @@ namespace TemplateFox.SDK.Model
             sb.Append("  StoreS3: ").Append(StoreS3).Append("\n");
             sb.Append("  S3Filepath: ").Append(S3Filepath).Append("\n");
             sb.Append("  S3Bucket: ").Append(S3Bucket).Append("\n");
+            sb.Append("  WebhookUrl: ").Append(WebhookUrl).Append("\n");
+            sb.Append("  WebhookSecret: ").Append(WebhookSecret).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -232,6 +250,30 @@ namespace TemplateFox.SDK.Model
                 {
                     yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for S3Bucket, must match a pattern of " + regexS3Bucket, new [] { "S3Bucket" });
                 }
+            }
+
+            // WebhookUrl (string) maxLength
+            if (this.WebhookUrl != null && this.WebhookUrl.Length > 2083)
+            {
+                yield return new ValidationResult("Invalid value for WebhookUrl, length must be less than 2083.", new [] { "WebhookUrl" });
+            }
+
+            // WebhookUrl (string) minLength
+            if (this.WebhookUrl != null && this.WebhookUrl.Length < 1)
+            {
+                yield return new ValidationResult("Invalid value for WebhookUrl, length must be greater than 1.", new [] { "WebhookUrl" });
+            }
+
+            // WebhookSecret (string) maxLength
+            if (this.WebhookSecret != null && this.WebhookSecret.Length > 256)
+            {
+                yield return new ValidationResult("Invalid value for WebhookSecret, length must be less than 256.", new [] { "WebhookSecret" });
+            }
+
+            // WebhookSecret (string) minLength
+            if (this.WebhookSecret != null && this.WebhookSecret.Length < 16)
+            {
+                yield return new ValidationResult("Invalid value for WebhookSecret, length must be greater than 16.", new [] { "WebhookSecret" });
             }
 
             yield break;

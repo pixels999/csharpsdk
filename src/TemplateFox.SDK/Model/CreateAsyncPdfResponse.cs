@@ -27,54 +27,47 @@ using OpenAPIDateConverter = TemplateFox.SDK.Client.OpenAPIDateConverter;
 namespace TemplateFox.SDK.Model
 {
     /// <summary>
-    /// Response for URL export type
+    /// Response for async PDF creation
     /// </summary>
-    [DataContract(Name = "CreatePdfResponse")]
-    public partial class CreatePdfResponse : IValidatableObject
+    [DataContract(Name = "CreateAsyncPdfResponse")]
+    public partial class CreateAsyncPdfResponse : IValidatableObject
     {
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreatePdfResponse" /> class.
+        /// Initial job status (always &#39;pending&#39;)
+        /// </summary>
+        /// <value>Initial job status (always &#39;pending&#39;)</value>
+        [DataMember(Name = "status", IsRequired = true, EmitDefaultValue = true)]
+        public JobStatus Status { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateAsyncPdfResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected CreatePdfResponse() { }
+        protected CreateAsyncPdfResponse() { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreatePdfResponse" /> class.
+        /// Initializes a new instance of the <see cref="CreateAsyncPdfResponse" /> class.
         /// </summary>
-        /// <param name="url">Signed URL to download the PDF (expires after specified time) (required).</param>
-        /// <param name="filename">Filename of the generated PDF (required).</param>
+        /// <param name="jobId">Unique job identifier for status polling (required).</param>
+        /// <param name="status">Initial job status (always &#39;pending&#39;) (required).</param>
         /// <param name="creditsRemaining">Remaining credits after this request (required).</param>
-        /// <param name="expiresIn">Seconds until URL expires (required).</param>
-        public CreatePdfResponse(string url = default, string filename = default, int creditsRemaining = default, int expiresIn = default)
+        public CreateAsyncPdfResponse(string jobId = default, JobStatus status = default, int creditsRemaining = default)
         {
-            // to ensure "url" is required (not null)
-            if (url == null)
+            // to ensure "jobId" is required (not null)
+            if (jobId == null)
             {
-                throw new ArgumentNullException("url is a required property for CreatePdfResponse and cannot be null");
+                throw new ArgumentNullException("jobId is a required property for CreateAsyncPdfResponse and cannot be null");
             }
-            this.Url = url;
-            // to ensure "filename" is required (not null)
-            if (filename == null)
-            {
-                throw new ArgumentNullException("filename is a required property for CreatePdfResponse and cannot be null");
-            }
-            this.Filename = filename;
+            this.JobId = jobId;
+            this.Status = status;
             this.CreditsRemaining = creditsRemaining;
-            this.ExpiresIn = expiresIn;
         }
 
         /// <summary>
-        /// Signed URL to download the PDF (expires after specified time)
+        /// Unique job identifier for status polling
         /// </summary>
-        /// <value>Signed URL to download the PDF (expires after specified time)</value>
-        [DataMember(Name = "url", IsRequired = true, EmitDefaultValue = true)]
-        public string Url { get; set; }
-
-        /// <summary>
-        /// Filename of the generated PDF
-        /// </summary>
-        /// <value>Filename of the generated PDF</value>
-        [DataMember(Name = "filename", IsRequired = true, EmitDefaultValue = true)]
-        public string Filename { get; set; }
+        /// <value>Unique job identifier for status polling</value>
+        [DataMember(Name = "job_id", IsRequired = true, EmitDefaultValue = true)]
+        public string JobId { get; set; }
 
         /// <summary>
         /// Remaining credits after this request
@@ -84,24 +77,16 @@ namespace TemplateFox.SDK.Model
         public int CreditsRemaining { get; set; }
 
         /// <summary>
-        /// Seconds until URL expires
-        /// </summary>
-        /// <value>Seconds until URL expires</value>
-        [DataMember(Name = "expires_in", IsRequired = true, EmitDefaultValue = true)]
-        public int ExpiresIn { get; set; }
-
-        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("class CreatePdfResponse {\n");
-            sb.Append("  Url: ").Append(Url).Append("\n");
-            sb.Append("  Filename: ").Append(Filename).Append("\n");
+            sb.Append("class CreateAsyncPdfResponse {\n");
+            sb.Append("  JobId: ").Append(JobId).Append("\n");
+            sb.Append("  Status: ").Append(Status).Append("\n");
             sb.Append("  CreditsRemaining: ").Append(CreditsRemaining).Append("\n");
-            sb.Append("  ExpiresIn: ").Append(ExpiresIn).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }

@@ -27,60 +27,61 @@ using OpenAPIDateConverter = TemplateFox.SDK.Client.OpenAPIDateConverter;
 namespace TemplateFox.SDK.Model
 {
     /// <summary>
-    /// Response for transactions list endpoint
+    /// Response for job list query
     /// </summary>
-    [DataContract(Name = "TransactionsResponse")]
-    public partial class TransactionsResponse : IValidatableObject
+    [DataContract(Name = "JobListResponse")]
+    public partial class JobListResponse : IValidatableObject
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionsResponse" /> class.
+        /// Initializes a new instance of the <see cref="JobListResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected TransactionsResponse() { }
+        protected JobListResponse() { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionsResponse" /> class.
+        /// Initializes a new instance of the <see cref="JobListResponse" /> class.
         /// </summary>
-        /// <param name="transactions">transactions (required).</param>
-        /// <param name="total">Total number of transactions (required).</param>
-        /// <param name="limit">Number of records returned (required).</param>
-        /// <param name="offset">Number of records skipped (required).</param>
-        public TransactionsResponse(List<Transaction> transactions = default, int total = default, int limit = default, int offset = default)
+        /// <param name="jobs">List of jobs (required).</param>
+        /// <param name="total">Total number of jobs matching filter (required).</param>
+        /// <param name="limit">Page size (required).</param>
+        /// <param name="offset">Page offset (required).</param>
+        public JobListResponse(List<JobStatusResponse> jobs = default, int total = default, int limit = default, int offset = default)
         {
-            // to ensure "transactions" is required (not null)
-            if (transactions == null)
+            // to ensure "jobs" is required (not null)
+            if (jobs == null)
             {
-                throw new ArgumentNullException("transactions is a required property for TransactionsResponse and cannot be null");
+                throw new ArgumentNullException("jobs is a required property for JobListResponse and cannot be null");
             }
-            this.Transactions = transactions;
+            this.Jobs = jobs;
             this.Total = total;
             this.Limit = limit;
             this.Offset = offset;
         }
 
         /// <summary>
-        /// Gets or Sets Transactions
+        /// List of jobs
         /// </summary>
-        [DataMember(Name = "transactions", IsRequired = true, EmitDefaultValue = true)]
-        public List<Transaction> Transactions { get; set; }
+        /// <value>List of jobs</value>
+        [DataMember(Name = "jobs", IsRequired = true, EmitDefaultValue = true)]
+        public List<JobStatusResponse> Jobs { get; set; }
 
         /// <summary>
-        /// Total number of transactions
+        /// Total number of jobs matching filter
         /// </summary>
-        /// <value>Total number of transactions</value>
+        /// <value>Total number of jobs matching filter</value>
         [DataMember(Name = "total", IsRequired = true, EmitDefaultValue = true)]
         public int Total { get; set; }
 
         /// <summary>
-        /// Number of records returned
+        /// Page size
         /// </summary>
-        /// <value>Number of records returned</value>
+        /// <value>Page size</value>
         [DataMember(Name = "limit", IsRequired = true, EmitDefaultValue = true)]
         public int Limit { get; set; }
 
         /// <summary>
-        /// Number of records skipped
+        /// Page offset
         /// </summary>
-        /// <value>Number of records skipped</value>
+        /// <value>Page offset</value>
         [DataMember(Name = "offset", IsRequired = true, EmitDefaultValue = true)]
         public int Offset { get; set; }
 
@@ -91,8 +92,8 @@ namespace TemplateFox.SDK.Model
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("class TransactionsResponse {\n");
-            sb.Append("  Transactions: ").Append(Transactions).Append("\n");
+            sb.Append("class JobListResponse {\n");
+            sb.Append("  Jobs: ").Append(Jobs).Append("\n");
             sb.Append("  Total: ").Append(Total).Append("\n");
             sb.Append("  Limit: ").Append(Limit).Append("\n");
             sb.Append("  Offset: ").Append(Offset).Append("\n");
